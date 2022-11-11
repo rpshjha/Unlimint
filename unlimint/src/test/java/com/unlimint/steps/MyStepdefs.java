@@ -62,8 +62,6 @@ public class MyStepdefs {
         users.forEach(user -> {
 
             WelcomePage home = new WelcomePage(getDriver());
-            home.goTo();
-            assertTrue(home.isAt(), "not able to navigate to home page");
             home.goToRegistrationPage();
 
             RegistrationPage register = new RegistrationPage(getDriver());
@@ -75,6 +73,7 @@ public class MyStepdefs {
             else if (user.equals("RECIPIENT"))
                 userType = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
 
+            assert userType != null;
             register.registerUserAs(userType);
             assertTrue(register.isRegistered(userType.getLogin().getUsername()), "not able to register user");
 
@@ -100,8 +99,6 @@ public class MyStepdefs {
     public void iLoginAsASENDER() {
 
         WelcomePage home = new WelcomePage(getDriver());
-        home.goTo();
-        assertTrue(home.isAt(), "not able to navigate to home page");
 
         Result user = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
         assertTrue(home.loginAs(user), "not able to login user");
@@ -124,4 +121,12 @@ public class MyStepdefs {
         assertTrue(billPay.isPaymentSuccessful(), "bill payment could not be done");
     }
 
+    @When("I navigate to {string}")
+    public void iNavigateToHttpsParabankParasoftComParabankIndexHtm(String url) {
+        WelcomePage home = new WelcomePage(getDriver());
+
+        logger.info("navigating to " + url);
+        home.goTo(url);
+        assertTrue(home.isAt(), "not able to navigate to home page");
+    }
 }

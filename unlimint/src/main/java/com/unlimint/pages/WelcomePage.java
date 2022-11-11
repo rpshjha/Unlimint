@@ -27,8 +27,9 @@ public class WelcomePage {
     private By input_password = By.name("password");
     private By btn_login = By.cssSelector("input[value='Log In']");
 
-    public void goTo() {
+    public void goTo(String url) {
         driver.get(PropertyReader.get("app.url"));
+        driver.get(url);
     }
 
     public void goToRegistrationPage() {
