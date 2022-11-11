@@ -5,6 +5,8 @@ Feature: UI Automated tests
 
   @001
   Scenario: Register a user and make a bill payment
-    Given I am a registered user
-    And recipient is a registered user
-    Then I can transfer '10' amount to recipient
+    Given I register user as
+      | SENDER    |
+      | RECIPIENT |
+    When I login as a SENDER
+    Then I can transfer amount '10' to RECIPIENT
