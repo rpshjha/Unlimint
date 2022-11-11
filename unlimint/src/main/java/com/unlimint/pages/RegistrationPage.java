@@ -49,6 +49,7 @@ public class RegistrationPage {
         if (isUserNameAlreadyExist()) {
             System.out.println("username already exists , going ahead with new username");
             String username = user.getLogin().getUsername() + System.currentTimeMillis();
+            user.getLogin().setUsername(username);
             this.driver.findElement(input_username).sendKeys(username);
         }
         this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());

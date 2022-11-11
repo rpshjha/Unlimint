@@ -3,6 +3,7 @@ package com.unlimint.pages;
 import com.unlimint.pojo.Result;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -31,7 +32,7 @@ public class BillPayPage {
 
     private By btn_send_payment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
 
-    public void payBillTo(Result user, int amount) {
+    public void payBillTo(Result user, String accountNo, int amount) {
 
         this.driver.findElement(input_payee_name).sendKeys(user.getName().getFirst());
         this.driver.findElement(input_address).sendKeys(user.getLocation().getStreet().getName());
@@ -39,8 +40,8 @@ public class BillPayPage {
         this.driver.findElement(input_state).sendKeys(user.getLocation().getState());
         this.driver.findElement(input_zipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
         this.driver.findElement(input_phone).sendKeys(user.getPhone());
-        this.driver.findElement(input_account).sendKeys(user.getId().getValue());
-        this.driver.findElement(input_verify_account).sendKeys(user.getId().getValue());
+        this.driver.findElement(input_account).sendKeys(accountNo);
+        this.driver.findElement(input_verify_account).sendKeys(accountNo);
 
         this.driver.findElement(input_amount).sendKeys(String.valueOf(amount));
 
@@ -48,6 +49,15 @@ public class BillPayPage {
         select.getOptions().stream().findFirst().get().click();
 
         this.driver.findElement(btn_send_payment).click();
+    }
+
+    public boolean isPaymentSuccessful() {
+        WebElement h1 = this.driver.findElement(By.cssSelector("div[ng-show='showResult'] h1.title"));
+        WebElement p = this.driver.findElement(By.cssSelector("div[ng-show='showResult'] h1.title + p + p"));
+
+        if (h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details."))
+            return true;
+        return false;
     }
 
     public boolean isAt() {
