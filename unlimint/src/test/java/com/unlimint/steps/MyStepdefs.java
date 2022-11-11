@@ -2,6 +2,7 @@ package com.unlimint.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.unlimint.core.DriverInstance;
 import com.unlimint.cucumber.Context;
 import com.unlimint.cucumber.TestContext;
 import com.unlimint.pages.AccountsOverviewPage;
@@ -10,6 +11,7 @@ import com.unlimint.pages.RegistrationPage;
 import com.unlimint.pages.WelcomePage;
 import com.unlimint.pojo.Result;
 import com.unlimint.pojo.Users;
+import com.unlimint.utils.PropertyReader;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
@@ -32,16 +34,19 @@ public class MyStepdefs {
         this.testContext = testContext;
     }
 
-    @Given("I generate {int} users")
-    public void iGenerateUsers(int noOfUser) {
+    @Given("I generate {int} users of {string} nationality")
+    public void iGenerateUsers(int noOfUser, String nationality) {
 
         logger.info("generating users .. ");
-        Response response = RestAssured.given().baseUri("https://randomuser.me")
+        Response response = RestAssured.given()
+                .baseUri("https://randomuser.me")
                 .queryParam("format", "pretty")
                 .queryParam("results", noOfUser)
-                .queryParam("nat", "IN")
+                .queryParam("nat", nationality)
                 .log().all()
-                .get("/api");
+                .get("/api")
+                .then().log().all()
+                .extract().response();
 
         ObjectMapper objectMapper = new ObjectMapper();
         Users users = null;
@@ -85,8 +90,7 @@ public class MyStepdefs {
 
             if (user.equals("SENDER"))
                 testContext.getScenarioContext().setContext(Context.SENDER_ACCOUNT_NO, accountNo);
-            else if (user.equals("RECIPIENT"))
-                testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
+            else testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
 
             home.logoutUser();
             assertTrue(home.isAt(), "not able to navigate to home page");
@@ -98,13 +102,16 @@ public class MyStepdefs {
     @When("I login as a SENDER")
     public void iLoginAsASENDER() {
 
+        DriverInstance.getDriver().manage().deleteAllCookies();
+
         WelcomePage home = new WelcomePage(getDriver());
+        home.goTo(PropertyReader.get("app.url"));
 
         Result user = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
         assertTrue(home.loginAs(user), "not able to login user");
     }
 
-    @Then("I can transfer amount {string} to RECIPIENT")
+    @Then("I can transfer amount {int} to RECIPIENT")
     public void iCanTransferAmountToRECIPIENT(int amount) {
 
         WelcomePage home = new WelcomePage(getDriver());
@@ -128,4 +135,5 @@ public class MyStepdefs {
         home.goTo(url);
         assertTrue(home.isAt(), "not able to navigate to home page");
     }
+
 }

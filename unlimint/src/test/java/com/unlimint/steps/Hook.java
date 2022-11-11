@@ -81,6 +81,7 @@ public class Hook {
         }
         final byte[] screenshot = takesScreenshot.getScreenshotAs(OutputType.BYTES);
         scenario.attach(screenshot, "image/png", fileName);
+        ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromPath(dest.getPath());
     }
 
     private static String getScreenshotPath() {

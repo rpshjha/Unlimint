@@ -1,7 +1,7 @@
 Feature: UI Automated tests
 
   Background: Generate user
-    Given I generate 2 users
+    Given I generate 2 users of 'AU' nationality
 
   @001
   Scenario: Register a user and make a bill payment
@@ -10,4 +10,4 @@ Feature: UI Automated tests
       | SENDER    |
       | RECIPIENT |
     Then I login as a SENDER
-    And I can transfer amount '10' to RECIPIENT
+    And I can transfer amount 10 to RECIPIENT

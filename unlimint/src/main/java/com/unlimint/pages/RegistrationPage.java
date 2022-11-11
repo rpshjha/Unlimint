@@ -1,6 +1,7 @@
 package com.unlimint.pages;
 
 import com.unlimint.pojo.Result;
+import com.unlimint.utils.RandomString;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -10,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.Random;
 
 public class RegistrationPage {
 
@@ -50,18 +52,27 @@ public class RegistrationPage {
         this.driver.findElement(input_zipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
         this.driver.findElement(input_phone).sendKeys(user.getPhone());
         this.driver.findElement(input_ssn).sendKeys(user.getId().getValue());
-        this.driver.findElement(input_username).sendKeys(user.getLogin().getUsername());
 
-        if (isUserNameAlreadyExist()) {
-            System.out.println("username already exists , going ahead with new username");
-            String username = user.getLogin().getUsername() + System.currentTimeMillis();
-            user.getLogin().setUsername(username);
-            this.driver.findElement(input_username).sendKeys(username);
-        }
+        String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(5);
+        this.driver.findElement(input_username).sendKeys(username);
+
         this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());
         this.driver.findElement(input_confirm_password).sendKeys(user.getLogin().getPassword());
 
         this.driver.findElement(btn_register).click();
+
+//        if (isUserNameAlreadyExist()) {
+//            logger.info("username already exists , going ahead with new username");
+//            String username = user.getLogin().getUsername() + System.currentTimeMillis();
+//            user.getLogin().setUsername(username);
+//            this.driver.findElement(input_username).clear();
+//            this.driver.findElement(input_username).sendKeys(username);
+//
+//            this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());
+//            this.driver.findElement(input_confirm_password).sendKeys(user.getLogin().getPassword());
+//
+//            this.driver.findElement(btn_register).click();
+//        }
     }
 
     public boolean isRegistered(String username) {

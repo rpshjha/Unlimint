@@ -20,7 +20,11 @@ This project requires the following pieces of software to run.
 
 ## HOW TO RUN THE TEST
 
-Open a command window and run:
+Go to project folder and type:
+
+    cd unlimint
+
+In command window and run:
 
     mvn clean test
 

@@ -4,6 +4,7 @@ import com.unlimint.pojo.Result;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.slf4j.Logger;
@@ -57,8 +58,9 @@ public class BillPayPage {
     }
 
     public boolean isPaymentSuccessful() {
-        WebElement h1 = this.driver.findElement(By.cssSelector("div[ng-show='showResult'] h1.title"));
-        WebElement p = this.driver.findElement(By.cssSelector("div[ng-show='showResult'] h1.title + p + p"));
+
+        WebElement h1 = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title")));
+        WebElement p = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title + p + p")));
 
         if (h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details."))
             return true;
