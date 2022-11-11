@@ -125,7 +125,6 @@ public class MyStepdefs {
     public void iNavigateToHttpsParabankParasoftComParabankIndexHtm(String url) {
         WelcomePage home = new WelcomePage(getDriver());
 
-        logger.info("navigating to " + url);
         home.goTo(url);
         assertTrue(home.isAt(), "not able to navigate to home page");
     }

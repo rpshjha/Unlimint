@@ -6,11 +6,14 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
 public class RegistrationPage {
 
+    private static final Logger logger = LoggerFactory.getLogger(RegistrationPage.class);
     private WebDriver driver;
     private WebDriverWait wait;
 
@@ -36,6 +39,9 @@ public class RegistrationPage {
     private By error_duplicate_username = By.id("customer.username.errors");
 
     public void registerUserAs(Result user) {
+
+        logger.info("registering user as " + user);
+
         this.driver.findElement(input_first_name).sendKeys(user.getName().getFirst());
         this.driver.findElement(input_last_name).sendKeys(user.getName().getLast());
         this.driver.findElement(input_address).sendKeys(user.getLocation().getStreet().getName());

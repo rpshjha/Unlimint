@@ -5,11 +5,14 @@ import com.unlimint.utils.PropertyReader;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
 public class WelcomePage {
 
+    private static final Logger logger = LoggerFactory.getLogger(WelcomePage.class);
     private WebDriver driver;
     private WebDriverWait wait;
 
@@ -28,6 +31,7 @@ public class WelcomePage {
     private By btn_login = By.cssSelector("input[value='Log In']");
 
     public void goTo(String url) {
+        logger.info("navigating to " + url);
         driver.get(PropertyReader.get("app.url"));
         driver.get(url);
     }
@@ -49,6 +53,9 @@ public class WelcomePage {
     }
 
     public boolean loginAs(Result user) {
+
+        logger.info("logging user");
+
         this.driver.findElement(input_username).sendKeys(user.getLogin().getUsername());
         this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());
         this.driver.findElement(btn_login).click();

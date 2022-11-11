@@ -6,11 +6,14 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
 
 public class BillPayPage {
 
+    private static final Logger logger = LoggerFactory.getLogger(BillPayPage.class);
     private WebDriver driver;
     private WebDriverWait wait;
 
@@ -33,6 +36,8 @@ public class BillPayPage {
     private By btn_send_payment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
 
     public void payBillTo(Result user, String accountNo, int amount) {
+
+        logger.info("paying bill to recipient");
 
         this.driver.findElement(input_payee_name).sendKeys(user.getName().getFirst());
         this.driver.findElement(input_address).sendKeys(user.getLocation().getStreet().getName());
