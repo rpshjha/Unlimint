@@ -18,7 +18,7 @@ public class RegistrationPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if registration page is displayed..");
-        return wait.until(d ->browserActions.getPageTitle().contains("ParaBank | Register for Free Online Account Access"));
+        return wait.until(d -> browser.getPageTitle().contains("ParaBank | Register for Free Online Account Access"));
     }
 
     private final By inputFirstName = By.id("customer.firstName");
@@ -32,32 +32,30 @@ public class RegistrationPage extends Page {
     private final By inputUsername = By.id("customer.username");
     private final By inputPassword = By.id("customer.password");
     private final By inputConfirmPassword = By.id("repeatedPassword");
-
     private final By btnRegister = By.cssSelector("input.button[type='submit'][value='Register']");
-
     private final By errorDuplicateUsername = By.id("customer.username.errors");
 
     public AccountServicesPage registerUserAs(User user) {
         log.info("registering user as " + user.getFirstName() + " " + user.getLastName());
 
-        this.driver.findElement(inputFirstName).sendKeys(user.getFirstName());
-        this.driver.findElement(inputLastName).sendKeys(user.getLastName());
-        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getAddress());
-        this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
-        this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
-        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getZipcode()));
-        this.driver.findElement(inputPhone).sendKeys(user.getPhone());
-        this.driver.findElement(inputSsn).sendKeys(user.getSsn());
+        this.element.enterText(inputFirstName, user.getFirstName());
+        this.element.enterText(inputLastName, user.getLastName());
+        this.element.enterText(inputAddress, user.getLocation().getAddress());
+        this.element.enterText(inputCity, user.getLocation().getCity());
+        this.element.enterText(inputState, user.getLocation().getState());
+        this.element.enterText(inputZipcode, String.valueOf(user.getLocation().getZipcode()));
+        this.element.enterText(inputPhone, user.getPhone());
+        this.element.enterText(inputSsn, user.getSsn());
 
         String username = user.getLogin().getUsername() + Random.getRandomInt(4);
         log.info("setting username for " + user.getFirstName() + " as " + username);
         user.getLogin().setUsername(username);
-        this.driver.findElement(inputUsername).sendKeys(username);
+        this.element.enterText(inputUsername, username);
 
-        this.driver.findElement(inputPassword).sendKeys(user.getLogin().getPassword());
-        this.driver.findElement(inputConfirmPassword).sendKeys(user.getLogin().getPassword());
+        this.element.enterText(inputPassword, user.getLogin().getPassword());
+        this.element.enterText(inputConfirmPassword, user.getLogin().getPassword());
 
-        this.driver.findElement(btnRegister).click();
+        this.element.click(btnRegister);
 
         if (isUserNameAlreadyExist()) {
             throw new DuplicateUserNameException(user.getLogin().getUsername());
@@ -70,7 +68,7 @@ public class RegistrationPage extends Page {
     public boolean isUserNameAlreadyExist() {
         try {
             log.info("checking for duplicate username message..");
-            return this.driver.findElement(errorDuplicateUsername).isDisplayed();
+            return this.element.isDisplayed(errorDuplicateUsername);
         } catch (NoSuchElementException e) {
             return false;
         }

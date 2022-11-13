@@ -5,7 +5,6 @@ import com.unlimint.pojo.User;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 
 import static com.unlimint.constant.Error.USERNAME_PASSWORD_NOT_VERIFIED;
 
@@ -19,27 +18,26 @@ public class LoginPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if welcome page is displayed..");
-        return wait.until(d -> browserActions.getPageTitle().contains("ParaBank | Welcome | Online Banking") && getPageHeading().contains("Customer Login"));
+        return wait.until(d -> browser.getPageTitle().contains("ParaBank | Welcome | Online Banking") && getPageHeading().contains("Customer Login"));
     }
 
     private final By btnRegister = By.linkText("Register");
-
     private final By inputUsername = By.name("username");
     private final By inputPassword = By.name("password");
     private final By btnLogin = By.cssSelector("input[value='Log In']");
 
     public RegistrationPage goToRegistrationPage() {
         log.info("navigating to user registration page");
-        this.driver.findElement(btnRegister).click();
+        this.element.click(btnRegister);
         return new RegistrationPage(driver);
     }
 
     public AccountServicesPage loginAs(User user) {
         log.info("logging in as ..\nusername : " + user.getLogin().getUsername() + "\npassword : " + user.getLogin().getPassword());
 
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputUsername)).sendKeys(user.getLogin().getUsername());
-        this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputPassword)).sendKeys(user.getLogin().getPassword());
-        this.wait.until(ExpectedConditions.elementToBeClickable(btnLogin)).click();
+        this.element.enterText(inputUsername, user.getLogin().getUsername());
+        this.element.enterText(inputPassword, user.getLogin().getPassword());
+        this.element.click(btnLogin);
 
         if (isError(USERNAME_PASSWORD_NOT_VERIFIED))
             throw new InvalidUsernameAndPasswordException();

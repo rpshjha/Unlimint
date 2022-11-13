@@ -1,11 +1,10 @@
 package com.unlimint.pages;
 
 import com.unlimint.core.BrowserActions;
+import com.unlimint.core.ScreenActions;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
@@ -17,33 +16,30 @@ public abstract class Page {
 
     final WebDriver driver;
     final WebDriverWait wait;
-    final BrowserActions browserActions;
+    final BrowserActions browser;
+    final ScreenActions element;
 
     protected Page(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(get("default.timeout"))));
-        this.browserActions = new BrowserActions(driver);
+        this.browser = new BrowserActions(driver);
+        this.element = new ScreenActions(driver);
     }
 
     public boolean isError(String errorMsg) {
         log.info("checking for error..");
-        WebElement errorTitle;
-        WebElement errorDesc;
         try {
-            errorTitle = this.wait
-                    .withTimeout(Duration.ofSeconds(5))
-                    .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.title")));
-            errorDesc = this.wait
-                    .withTimeout(Duration.ofSeconds(5))
-                    .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p.error")));
+            String errorTitle = element.getText(By.cssSelector("h1.title"), 5);
+            String errorDesc = element.getText(By.cssSelector("p.error"), 5);
+            return errorTitle.contains("Error!") && errorDesc.contains(errorMsg);
         } catch (org.openqa.selenium.TimeoutException timeoutException) {
             return false;
         }
-        return errorTitle.getText().contains("Error!") && errorDesc.getText().contains(errorMsg);
+
     }
 
     public String getPageHeading() {
-        return this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div#leftPanel h2"))).getText();
+        return this.element.getText(By.cssSelector("div#leftPanel h2"));
     }
 
     public Page navigateTo(String url) {
