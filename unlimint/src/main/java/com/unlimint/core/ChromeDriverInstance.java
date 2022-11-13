@@ -1,14 +1,16 @@
 package com.unlimint.core;
 
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Log4j
 public class ChromeDriverInstance {
 
-    private static Logger logger = LoggerFactory.getLogger(ChromeDriverInstance.class);
+    private ChromeDriverInstance() {
+    }
 
     public static ChromeDriver createDriverUsingChrome() {
+        log.info("Opening the browser : Chrome");
         return new ChromeDriver();
     }
 }

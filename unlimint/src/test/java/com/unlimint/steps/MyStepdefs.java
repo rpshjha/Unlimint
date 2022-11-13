@@ -2,33 +2,28 @@ package com.unlimint.steps;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.unlimint.core.DriverInstance;
 import com.unlimint.cucumber.Context;
 import com.unlimint.cucumber.TestContext;
-import com.unlimint.pages.AccountsOverviewPage;
-import com.unlimint.pages.BillPayPage;
-import com.unlimint.pages.RegistrationPage;
-import com.unlimint.pages.WelcomePage;
+import com.unlimint.pages.*;
 import com.unlimint.pojo.Result;
 import com.unlimint.pojo.Users;
-import com.unlimint.utils.PropertyReader;
+import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j;
 
 import java.util.List;
 
 import static com.unlimint.core.DriverInstance.getDriver;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@Log4j
 public class MyStepdefs {
 
-    private static final Logger logger = LoggerFactory.getLogger(MyStepdefs.class);
-    private TestContext testContext;
+    private final TestContext testContext;
 
     public MyStepdefs(TestContext testContext) {
         this.testContext = testContext;
@@ -36,17 +31,14 @@ public class MyStepdefs {
 
     @Given("I generate {int} users of {string} nationality")
     public void iGenerateUsers(int noOfUser, String nationality) {
-
-        logger.info("generating users .. ");
+        log.info("generating users .. ");
         Response response = RestAssured.given()
                 .baseUri("https://randomuser.me")
                 .queryParam("format", "pretty")
                 .queryParam("results", noOfUser)
                 .queryParam("nat", nationality)
                 .log().all()
-                .get("/api")
-                .then().log().all()
-                .extract().response();
+                .get("/api");
 
         ObjectMapper objectMapper = new ObjectMapper();
         Users users = null;
@@ -56,34 +48,32 @@ public class MyStepdefs {
             e.printStackTrace();
         }
 
+        assert users != null;
         testContext.getScenarioContext().setContext(Context.SENDER, users.getResults().get(0));
         testContext.getScenarioContext().setContext(Context.RECIPIENT, users.getResults().get(1));
     }
 
 
-    @Given("I register user as")
+    @And("I register user as")
     public void iRegisterUserAs(List<String> users) {
-
         users.forEach(user -> {
 
-            WelcomePage home = new WelcomePage(getDriver());
-            home.goToRegistrationPage();
+            LoginPage loginPage = new LoginPage(getDriver());
+            RegistrationPage register = loginPage.goToRegistrationPage();
 
-            RegistrationPage register = new RegistrationPage(getDriver());
             assertTrue(register.isAt(), "not able to navigate to registration page");
 
             Result userType = null;
             if (user.equals("SENDER"))
                 userType = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
             else if (user.equals("RECIPIENT"))
-                userType = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
+                userType = (Result) testContext.getScenarioContext().getContext(Context.RECIPIENT);
 
             assert userType != null;
-            register.registerUserAs(userType);
-            assertTrue(register.isRegistered(userType.getLogin().getUsername()), "not able to register user");
+            AccountServicesPage accountServicesPage = register.registerUserAs(userType);
+            assertTrue(accountServicesPage.isRegistered(userType.getLogin().getUsername()), "not able to register user");
 
-            home.goToAccountsOverviewPage();
-            AccountsOverviewPage accountsOverviewPage = new AccountsOverviewPage(getDriver());
+            AccountsOverviewPage accountsOverviewPage = accountServicesPage.goToAccountsOverviewPage();
             assertTrue(accountsOverviewPage.isAt());
 
             String accountNo = accountsOverviewPage.getAccountNo();
@@ -92,32 +82,28 @@ public class MyStepdefs {
                 testContext.getScenarioContext().setContext(Context.SENDER_ACCOUNT_NO, accountNo);
             else testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
 
-            home.logoutUser();
-            assertTrue(home.isAt(), "not able to navigate to home page");
+            loginPage = accountServicesPage.logout();
+            assertTrue(loginPage.isAt(), "not able to navigate to home page");
 
         });
-
     }
 
     @When("I login as a SENDER")
     public void iLoginAsASENDER() {
 
-        DriverInstance.getDriver().manage().deleteAllCookies();
-
-        WelcomePage home = new WelcomePage(getDriver());
-        home.goTo(PropertyReader.get("app.url"));
+        LoginPage loginPage = new LoginPage(getDriver());
 
         Result user = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
-        assertTrue(home.loginAs(user), "not able to login user");
+
+        AccountServicesPage overviewPage = loginPage.loginAs(user);
+        assertTrue(overviewPage.isAt(), "not able to login user");
     }
 
     @Then("I can transfer amount {int} to RECIPIENT")
     public void iCanTransferAmountToRECIPIENT(int amount) {
+        AccountServicesPage accountServicesPage = new AccountServicesPage(getDriver());
 
-        WelcomePage home = new WelcomePage(getDriver());
-        home.goToBillPayPage();
-
-        BillPayPage billPay = new BillPayPage(getDriver());
+        BillPayPage billPay = accountServicesPage.goToBillPayPage();
         assertTrue(billPay.isAt(), "not able to navigate to bill pay page");
 
         Result user = (Result) testContext.getScenarioContext().getContext(Context.RECIPIENT);
@@ -129,11 +115,11 @@ public class MyStepdefs {
     }
 
     @When("I navigate to {string}")
-    public void iNavigateToHttpsParabankParasoftComParabankIndexHtm(String url) {
-        WelcomePage home = new WelcomePage(getDriver());
+    public void iNavigateTo(String url) {
+        Page page = new LoginPage(getDriver());
 
-        home.goTo(url);
-        assertTrue(home.isAt(), "not able to navigate to home page");
+        page.navigateTo(url);
+        assertTrue(page.isAt(), "not able to navigate to home page");
     }
 
 }

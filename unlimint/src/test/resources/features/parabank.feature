@@ -5,9 +5,9 @@ Feature: UI Automated tests
 
   @001
   Scenario: Register a user and make a bill payment
-    When I navigate to 'https://parabank.parasoft.com/parabank/index.htm'
+    Given I navigate to 'https://parabank.parasoft.com/parabank/index.htm'
     And I register user as
       | SENDER    |
       | RECIPIENT |
-    Then I login as a SENDER
-    And I can transfer amount 10 to RECIPIENT
+    When I login as a SENDER
+    Then I can transfer amount 10 to RECIPIENT

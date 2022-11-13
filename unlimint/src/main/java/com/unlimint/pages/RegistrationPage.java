@@ -1,99 +1,77 @@
 package com.unlimint.pages;
 
+import com.unlimint.exception.DuplicateUserNameException;
 import com.unlimint.pojo.Result;
 import com.unlimint.utils.RandomString;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-import java.util.Random;
-
-public class RegistrationPage {
-
-    private static final Logger logger = LoggerFactory.getLogger(RegistrationPage.class);
-    private WebDriver driver;
-    private WebDriverWait wait;
+@Log4j
+public class RegistrationPage extends Page {
 
     public RegistrationPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        super(driver);
     }
 
-    private By input_first_name = By.id("customer.firstName");
-    private By input_last_name = By.id("customer.lastName");
-    private By input_address = By.id("customer.address.street");
-    private By input_city = By.id("customer.address.city");
-    private By input_state = By.id("customer.address.state");
-    private By input_zipcode = By.id("customer.address.zipCode");
-    private By input_phone = By.id("customer.phoneNumber");
-    private By input_ssn = By.id("customer.ssn");
-    private By input_username = By.id("customer.username");
-    private By input_password = By.id("customer.password");
-    private By input_confirm_password = By.id("repeatedPassword");
+    @Override
+    public boolean isAt() {
+        log.info("verifying if registration page is displayed..");
+        return wait.until(d -> getPageTitle().contains("ParaBank | Register for Free Online Account Access"));
+    }
 
-    private By btn_register = By.cssSelector("input.button[type='submit'][value='Register']");
+    private final By inputFirstName = By.id("customer.firstName");
+    private final By inputLastName = By.id("customer.lastName");
+    private final By inputAddress = By.id("customer.address.street");
+    private final By inputCity = By.id("customer.address.city");
+    private final By inputState = By.id("customer.address.state");
+    private final By inputZipcode = By.id("customer.address.zipCode");
+    private final By inputPhone = By.id("customer.phoneNumber");
+    private final By inputSsn = By.id("customer.ssn");
+    private final By inputUsername = By.id("customer.username");
+    private final By inputPassword = By.id("customer.password");
+    private final By inputConfirmPassword = By.id("repeatedPassword");
 
-    private By error_duplicate_username = By.id("customer.username.errors");
+    private final By btnRegister = By.cssSelector("input.button[type='submit'][value='Register']");
 
-    public void registerUserAs(Result user) {
+    private final By errorDuplicateUsername = By.id("customer.username.errors");
 
-        logger.info("registering user as " + user);
+    public AccountServicesPage registerUserAs(Result user) {
+        log.info("registering user as " + user.getName().getFirst() + " " + user.getName().getLast());
 
-        this.driver.findElement(input_first_name).sendKeys(user.getName().getFirst());
-        this.driver.findElement(input_last_name).sendKeys(user.getName().getLast());
-        this.driver.findElement(input_address).sendKeys(user.getLocation().getStreet().getName());
-        this.driver.findElement(input_city).sendKeys(user.getLocation().getCity());
-        this.driver.findElement(input_state).sendKeys(user.getLocation().getState());
-        this.driver.findElement(input_zipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
-        this.driver.findElement(input_phone).sendKeys(user.getPhone());
-        this.driver.findElement(input_ssn).sendKeys(user.getId().getValue());
+        this.driver.findElement(inputFirstName).sendKeys(user.getName().getFirst());
+        this.driver.findElement(inputLastName).sendKeys(user.getName().getLast());
+        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getStreet().getName());
+        this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
+        this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
+        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
+        this.driver.findElement(inputPhone).sendKeys(user.getPhone());
+        this.driver.findElement(inputSsn).sendKeys(user.getId().getValue());
 
         String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(5);
-        this.driver.findElement(input_username).sendKeys(username);
+        this.driver.findElement(inputUsername).sendKeys(username);
 
-        this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());
-        this.driver.findElement(input_confirm_password).sendKeys(user.getLogin().getPassword());
+        this.driver.findElement(inputPassword).sendKeys(user.getLogin().getPassword());
+        this.driver.findElement(inputConfirmPassword).sendKeys(user.getLogin().getPassword());
 
-        this.driver.findElement(btn_register).click();
+        this.driver.findElement(btnRegister).click();
 
-//        if (isUserNameAlreadyExist()) {
-//            logger.info("username already exists , going ahead with new username");
-//            String username = user.getLogin().getUsername() + System.currentTimeMillis();
-//            user.getLogin().setUsername(username);
-//            this.driver.findElement(input_username).clear();
-//            this.driver.findElement(input_username).sendKeys(username);
-//
-//            this.driver.findElement(input_password).sendKeys(user.getLogin().getPassword());
-//            this.driver.findElement(input_confirm_password).sendKeys(user.getLogin().getPassword());
-//
-//            this.driver.findElement(btn_register).click();
-//        }
-    }
-
-    public boolean isRegistered(String username) {
-        WebElement h1 = this.driver.findElement(By.cssSelector("h1.title"));
-        WebElement p = this.driver.findElement(By.cssSelector("h1.title + p"));
-
-        if (h1.getText().contains("Welcome " + username) && p.getText().contains("Your account was created successfully. You are now logged in."))
-            return true;
-        return false;
+        if (isUserNameAlreadyExist()) {
+            throw new DuplicateUserNameException(user.getLogin().getUsername());
+        } else {
+            log.info("registration successful!");
+        }
+        return new AccountServicesPage(driver);
     }
 
     public boolean isUserNameAlreadyExist() {
         try {
-            return this.driver.findElement(error_duplicate_username).isDisplayed();
+            log.info("checking for duplicate username message..");
+            return this.driver.findElement(errorDuplicateUsername).isDisplayed();
         } catch (NoSuchElementException e) {
             return false;
         }
-    }
-
-    public boolean isAt() {
-        return wait.until(d -> this.driver.getTitle().contains("ParaBank | Register for Free Online Account Access"));
     }
 
 }

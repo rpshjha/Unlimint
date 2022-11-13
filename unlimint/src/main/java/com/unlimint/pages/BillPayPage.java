@@ -1,74 +1,67 @@
 package com.unlimint.pages;
 
 import com.unlimint.pojo.Result;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Select;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
-
-public class BillPayPage {
-
-    private static final Logger logger = LoggerFactory.getLogger(BillPayPage.class);
-    private WebDriver driver;
-    private WebDriverWait wait;
+@Log4j
+public class BillPayPage extends Page {
 
     public BillPayPage(WebDriver driver) {
-        this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        super(driver);
     }
 
-    private By input_payee_name = By.name("payee.name");
-    private By input_address = By.name("payee.address.street");
-    private By input_city = By.name("payee.address.city");
-    private By input_state = By.name("payee.address.state");
-    private By input_zipcode = By.name("payee.address.zipCode");
-    private By input_phone = By.name("payee.phoneNumber");
-    private By input_account = By.name("payee.accountNumber");
-    private By input_verify_account = By.name("verifyAccount");
-    private By input_amount = By.name("amount");
-    private By input_from_account = By.name("fromAccountId");
+    @Override
+    public boolean isAt() {
+        log.info("verifying if bill pay page is displayed..");
+        return wait.until(d -> this.driver.getTitle().contains("ParaBank | Bill Pay"));
+    }
 
-    private By btn_send_payment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
+    private final By inputPayeeName = By.name("payee.name");
+    private final By inputAddress = By.name("payee.address.street");
+    private final By inputCity = By.name("payee.address.city");
+    private final By inputState = By.name("payee.address.state");
+    private final By inputZipcode = By.name("payee.address.zipCode");
+    private final By inputPhone = By.name("payee.phoneNumber");
+    private final By inputAccount = By.name("payee.accountNumber");
+    private final By inputVerifyAccount = By.name("verifyAccount");
+    private final By inputAmount = By.name("amount");
+    private final By inputFromAccount = By.name("fromAccountId");
 
-    public void payBillTo(Result user, String accountNo, int amount) {
+    private final By btnSendPayment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
 
-        logger.info("paying bill to recipient");
+    public BillPayPage payBillTo(Result user, String accountNo, int amount) {
+        log.info("paying bill to recipient");
 
-        this.driver.findElement(input_payee_name).sendKeys(user.getName().getFirst());
-        this.driver.findElement(input_address).sendKeys(user.getLocation().getStreet().getName());
-        this.driver.findElement(input_city).sendKeys(user.getLocation().getCity());
-        this.driver.findElement(input_state).sendKeys(user.getLocation().getState());
-        this.driver.findElement(input_zipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
-        this.driver.findElement(input_phone).sendKeys(user.getPhone());
-        this.driver.findElement(input_account).sendKeys(accountNo);
-        this.driver.findElement(input_verify_account).sendKeys(accountNo);
+        this.driver.findElement(inputPayeeName).sendKeys(user.getName().getFirst());
+        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getStreet().getName());
+        this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
+        this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
+        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
+        this.driver.findElement(inputPhone).sendKeys(user.getPhone());
+        this.driver.findElement(inputAccount).sendKeys(accountNo);
+        this.driver.findElement(inputVerifyAccount).sendKeys(accountNo);
 
-        this.driver.findElement(input_amount).sendKeys(String.valueOf(amount));
+        this.driver.findElement(inputAmount).sendKeys(String.valueOf(amount));
 
-        Select select = new Select(this.driver.findElement(input_from_account));
-        select.getOptions().stream().findFirst().get().click();
+        Select select = new Select(this.driver.findElement(inputFromAccount));
+        select.getOptions().stream().findFirst().ifPresent(WebElement::click);
 
-        this.driver.findElement(btn_send_payment).click();
+        this.driver.findElement(btnSendPayment).click();
+        return this;
     }
 
     public boolean isPaymentSuccessful() {
+        log.info("verifying payment success message");
 
         WebElement h1 = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title")));
         WebElement p = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title + p + p")));
 
-        if (h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details."))
-            return true;
-        return false;
-    }
-
-    public boolean isAt() {
-        return wait.until(d -> this.driver.getTitle().contains("ParaBank | Bill Pay"));
+        return h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details.");
     }
 
 }

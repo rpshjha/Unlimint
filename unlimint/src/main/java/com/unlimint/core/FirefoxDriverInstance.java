@@ -1,18 +1,16 @@
 package com.unlimint.core;
 
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.firefox.FirefoxDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Log4j
 public class FirefoxDriverInstance {
 
     private FirefoxDriverInstance() {
     }
 
-    private static Logger logger = LoggerFactory.getLogger(FirefoxDriverInstance.class);
-
     public static FirefoxDriver createDriverUsingFirefox() {
-        logger.info("Opening the browser : Firefox");
+        log.info("Opening the browser : Firefox");
         return new FirefoxDriver();
     }
 }

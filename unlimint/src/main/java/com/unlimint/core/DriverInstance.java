@@ -1,14 +1,13 @@
 package com.unlimint.core;
 
 import com.unlimint.utils.PropertyReader;
+import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.WebDriver;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+@Log4j
 public class DriverInstance {
 
-    private static Logger logger = LoggerFactory.getLogger(DriverInstance.class);
-    private static ThreadLocal<WebDriver> wDriver = new ThreadLocal<>();
+    private static final ThreadLocal<WebDriver> wDriver = new ThreadLocal<>();
 
     private DriverInstance() {
     }
@@ -20,25 +19,23 @@ public class DriverInstance {
      * @return the browser driver
      */
     private static WebDriver getBrowserDriver(String browserName) {
-
         WebDriver driver = null;
 
         if (browserName == null)
             browserName = "chrome";
 
         switch (browserName) {
-
             case "firefox":
                 driver = FirefoxDriverInstance.createDriverUsingFirefox();
                 break;
             case "chrome":
                 driver = ChromeDriverInstance.createDriverUsingChrome();
                 break;
-
             default:
                 break;
         }
 
+        assert driver != null;
         if (Boolean.parseBoolean(PropertyReader.get("isWindowMax")))
             driver.manage().window().maximize();
 
@@ -46,7 +43,7 @@ public class DriverInstance {
     }
 
     public static void initializeDriver(final String browser) {
-        logger.info("initializing the web-driver");
+        log.info("initializing the web-driver");
         wDriver.set(getBrowserDriver(browser));
     }
 
@@ -66,7 +63,7 @@ public class DriverInstance {
      */
     public static void killDriver() {
         if (getDriver() != null) {
-            logger.info("closing the browser");
+            log.info("closing the browser");
             getDriver().quit();
         }
         wDriver.remove();

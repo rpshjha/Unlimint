@@ -1,34 +1,37 @@
 package com.unlimint.steps;
 
 import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
-import com.unlimint.core.DriverInstance;
 import com.unlimint.utils.PropertyReader;
-import io.cucumber.java.*;
+import io.cucumber.java.After;
+import io.cucumber.java.Before;
+import io.cucumber.java.Scenario;
+import lombok.extern.log4j.Log4j;
 import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
+import static com.unlimint.core.DriverInstance.getDriver;
+import static com.unlimint.core.DriverInstance.initializeDriver;
+
+@Log4j
 public class Hook {
 
-    private static final Logger logger = LoggerFactory.getLogger(Hook.class);
-
-    @Before()
-    public void beforeScenario() {
-        DriverInstance.initializeDriver(PropertyReader.get("browser"));
-        DriverInstance.getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
+    @Before
+    public void beforeScenario(Scenario scenario) {
+        log.info("executing scenario " + scenario.getName());
+        initializeDriver(PropertyReader.get("browser"));
+        getDriver().manage().timeouts().pageLoadTimeout(Duration.ofSeconds(15));
     }
 
     @After
     public void afterScenario(Scenario scenario) {
-        DriverInstance.killDriver();
+//        DriverInstance.killDriver();
 
-        logger.info(scenario.getName().toUpperCase() + " got " + scenario.getStatus());
+        log.info(scenario.getName().toUpperCase() + " got " + scenario.getStatus());
         switch (scenario.getStatus()) {
             case PASSED:
                 System.out.println(",------.    ,---.    ,---.    ,---.   ,------. ,------.   \n" +
@@ -58,33 +61,29 @@ public class Hook {
         }
         try {
             ExtentCucumberAdapter.getCurrentScenario().assignAuthor(System.getProperty("user.name"));
+            captureScreenshot(scenario.getName());
         } catch (java.lang.NullPointerException ignore) {
         }
     }
 
-    @BeforeStep
-    public void beforeEachStep(io.cucumber.java.Scenario scenario) {
-        logger.info("executing step " + scenario.getName());
-    }
 
-    @AfterStep
-    public void afterEachStep(Scenario scenario) {
-        logger.info("saving screenshot for " + scenario.getName());
-        String fileName = getScreenshotPath() + File.separator + scenario.getName() + ".png";
-        TakesScreenshot takesScreenshot = ((TakesScreenshot) DriverInstance.getDriver());
-        File src = takesScreenshot.getScreenshotAs(OutputType.FILE);
+    private static void captureScreenshot(String scenarioName) {
+        String getScreenshotPath = String.valueOf(PropertyReader.get("screenshot.dir"));
+        String fileName = getScreenshotPath + File.separator + scenarioName + ".png";
+
+        TakesScreenshot takesScreenshot = ((TakesScreenshot) getDriver());
+        File screenshotAsFile = takesScreenshot.getScreenshotAs(OutputType.FILE);
+        final String screenshotInBase64 = takesScreenshot.getScreenshotAs(OutputType.BASE64);
+
         File dest = new File(System.getProperty("user.dir") + File.separator + fileName);
         try {
-            FileUtils.copyFile(src, dest);
+            FileUtils.copyFile(screenshotAsFile, dest);
+            log.info("saving screenshot for " + scenarioName);
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
-        final byte[] screenshot = takesScreenshot.getScreenshotAs(OutputType.BYTES);
-        scenario.attach(screenshot, "image/png", fileName);
-        ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromPath(dest.getPath());
-    }
 
-    private static String getScreenshotPath() {
-        return String.valueOf(PropertyReader.get("screenshot.dir"));
+        ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromBase64String(screenshotInBase64, scenarioName);
     }
 }

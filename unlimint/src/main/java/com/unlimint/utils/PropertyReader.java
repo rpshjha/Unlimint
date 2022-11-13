@@ -1,12 +1,12 @@
 package com.unlimint.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.log4j.Log4j;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Properties;
 
+@Log4j
 public class PropertyReader {
 
     private PropertyReader() {
@@ -14,7 +14,6 @@ public class PropertyReader {
 
     private static Properties properties = null;
     private static final String FILE_NAME = "application.properties";
-    private static final Logger logger = LoggerFactory.getLogger(PropertyReader.class);
 
     static {
         initProperty();
@@ -30,7 +29,7 @@ public class PropertyReader {
                 }
             }
         } catch (FileNotFoundException e) {
-            logger.error("file not found {}", FILE_NAME);
+            log.error("file not found " + FILE_NAME);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -5,17 +5,17 @@ import java.util.Map;
 
 public class ScenarioContext {
 
-    private static Map<Context, Object> scenarioContext;
+    private Map<Context, Object> contextObjectMap;
 
     public ScenarioContext() {
-        scenarioContext = new HashMap<>();
+        contextObjectMap = new HashMap<>();
     }
 
     public void setContext(Context key, Object value) {
-        scenarioContext.put(key, value);
+        contextObjectMap.put(key, value);
     }
 
     public Object getContext(Context key) {
-        return scenarioContext.get(key);
+        return contextObjectMap.get(key);
     }
 }
