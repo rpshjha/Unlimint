@@ -35,6 +35,11 @@ public class RegistrationPage extends Page {
     private final By btnRegister = By.cssSelector("input.button[type='submit'][value='Register']");
     private final By errorDuplicateUsername = By.id("customer.username.errors");
 
+    /**
+     *
+     * @param user
+     * @return
+     */
     public AccountServicesPage registerUserAs(User user) {
         log.info("registering user as " + user.getFirstName() + " " + user.getLastName());
 

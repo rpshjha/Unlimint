@@ -19,7 +19,6 @@ public class AccountsOverviewPage extends Page {
 
     private final By txtAccountNo = By.xpath("//table[@id='accountTable']/tbody/tr[@ng-repeat='account in accounts']/td/a");
 
-
     public String getAccountNo() {
         log.info("fetching account no");
         return this.element.getText(txtAccountNo);
