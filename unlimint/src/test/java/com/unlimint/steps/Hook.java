@@ -17,8 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.time.Duration;
 
-import static com.unlimint.core.DriverInstance.getDriver;
-import static com.unlimint.core.DriverInstance.initializeDriver;
+import static com.unlimint.core.DriverInstance.*;
 
 @Log4j
 public class Hook {
@@ -32,7 +31,7 @@ public class Hook {
 
     @After
     public void afterScenario(Scenario scenario) {
-//        DriverInstance.killDriver();
+        killDriver();
 
         log.info(scenario.getName().toUpperCase() + " got " + scenario.getStatus());
         switch (scenario.getStatus()) {

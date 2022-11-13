@@ -41,8 +41,8 @@ public class MyStepdefs {
         User sender = setUserData(response, 0);
         User recipient = setUserData(response, 1);
 
-        log.info("sender user data is generated " + sender);
-        log.info("recipient user data is generated " + recipient);
+        log.info("sender user data is generated \n" + sender);
+        log.info("recipient user data is generated \n" + recipient);
 
         testContext.getScenarioContext().setContext(Context.SENDER, sender);
         testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);

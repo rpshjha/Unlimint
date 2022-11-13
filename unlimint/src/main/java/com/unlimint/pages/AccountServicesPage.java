@@ -15,7 +15,7 @@ public class AccountServicesPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if accounts services page is displayed..");
-        return wait.until(d -> getPageTitle().contains("ParaBank | Customer Created") && getPageHeading().contains("Account Services"));
+        return wait.until(d -> getPageHeading().contains("Account Services"));
     }
 
     private final By linkBillPay = By.linkText("Bill Pay");

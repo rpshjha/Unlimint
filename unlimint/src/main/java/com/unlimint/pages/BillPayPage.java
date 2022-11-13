@@ -34,6 +34,10 @@ public class BillPayPage extends Page {
 
     private final By btnSendPayment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
 
+    private final By payeeName = By.cssSelector("span#payeeName");
+    private final By transferredAmount = By.cssSelector("span#amount");
+    private final By fromAccount = By.cssSelector("span#fromAccountId");
+
     public BillPayPage payBillTo(User user, String accountNo, int amount) {
         log.info("paying bill to recipient");
 
@@ -61,6 +65,10 @@ public class BillPayPage extends Page {
         WebElement h1 = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title")));
         WebElement p = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title + p + p")));
 
+        log.info("bill payment details..");
+        log.info("payee name " + driver.findElement(payeeName).getText());
+        log.info("amount" + driver.findElement(inputAmount).getText());
+        log.info("from account no " + driver.findElement(fromAccount).getText());
         return h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details.");
     }
 

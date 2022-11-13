@@ -50,6 +50,8 @@ public class RegistrationPage extends Page {
         this.driver.findElement(inputSsn).sendKeys(user.getSsn());
 
         String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(4);
+        log.info("setting username for " + user.getFirstName() + " as " + username);
+        user.getLogin().setUsername(username);
         this.driver.findElement(inputUsername).sendKeys(username);
 
         this.driver.findElement(inputPassword).sendKeys(user.getLogin().getPassword());

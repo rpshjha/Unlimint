@@ -30,9 +30,18 @@ public abstract class Page {
 
     public boolean isError(String errorMsg) {
         log.info("checking for error..");
-        WebElement errorTitle = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.title")));
-        WebElement errorDesc = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p.error")));
-
+        WebElement errorTitle;
+        WebElement errorDesc;
+        try {
+            errorTitle = this.wait
+                    .withTimeout(Duration.ofSeconds(5))
+                    .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("h1.title")));
+            errorDesc = this.wait
+                    .withTimeout(Duration.ofSeconds(5))
+                    .until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("p.error")));
+        } catch (org.openqa.selenium.TimeoutException timeoutException) {
+            return false;
+        }
         return errorTitle.getText().contains("Error!") && errorDesc.getText().contains(errorMsg);
     }
 
