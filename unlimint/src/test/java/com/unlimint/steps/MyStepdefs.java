@@ -22,8 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class MyStepdefs {
 
     private final TestContext testContext;
-    private User sender;
-    private User recipient;
 
     public MyStepdefs(TestContext testContext) {
         this.testContext = testContext;
@@ -40,8 +38,8 @@ public class MyStepdefs {
                 .log().all()
                 .get("/api");
 
-        sender = setUserData(response, 0);
-        recipient = setUserData(response, 1);
+        User sender = setUserData(response, 0);
+        User recipient = setUserData(response, 1);
 
         log.info("sender user data is generated " + sender);
         log.info("recipient user data is generated " + recipient);
