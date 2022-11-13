@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.unlimint.core.DriverInstance.getDriver;
 import static com.unlimint.steps.TestHelper.setUserData;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j
@@ -75,8 +76,7 @@ public class MyStepdefs {
 
             if (user.equals("SENDER"))
                 testContext.getScenarioContext().setContext(Context.SENDER_ACCOUNT_NO, accountNo);
-            else if (user.equals("RECIPIENT"))
-                testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
+            else testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
 
             loginPage = accountServicesPage.logout();
             assertTrue(loginPage.isAt(), "not able to navigate to home page");
@@ -100,18 +100,22 @@ public class MyStepdefs {
         BillPayPage billPay = accountServicesPage.goToBillPayPage();
         assertTrue(billPay.isAt(), "not able to navigate to bill pay page");
 
-        User user = (User) testContext.getScenarioContext().getContext(Context.RECIPIENT);
+        User recipient = (User) testContext.getScenarioContext().getContext(Context.RECIPIENT);
         String accountNoRecipient = (String) testContext.getScenarioContext().getContext(Context.RECIPIENT_ACCOUNT_NO);
+        String accountNoSender = (String) testContext.getScenarioContext().getContext(Context.SENDER_ACCOUNT_NO);
 
-        billPay.payBillTo(user, accountNoRecipient, amount);
+        billPay.payBillTo(recipient, accountNoRecipient, amount);
         assertTrue(billPay.isPaymentSuccessful(), "bill payment could not be done");
+        assertEquals(billPay.getPayeeName(), recipient.getFirstName() + " " + recipient.getLastName(), "payee name is not correct");
+        assertEquals(billPay.getTransferredAmount(), amount, "amount transferred is not correct");
+        assertEquals(billPay.getFromAccountNo(), accountNoSender, "account no of sender is not correct");
     }
 
     @When("I navigate to {string}")
     public void iNavigateTo(String url) {
         Page page = new LoginPage(getDriver());
-
         page.navigateTo(url);
+
         assertTrue(page.isAt(), "not able to navigate to home page");
     }
 

@@ -15,7 +15,7 @@ public class AccountsOverviewPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if accounts overview page is displayed..");
-        return wait.until(d -> getPageTitle().contains("ParaBank | Accounts Overview"));
+        return wait.until(d -> browserActions.getPageTitle().contains("ParaBank | Accounts Overview"));
     }
 
     private final By txtAccountNo = By.xpath("//table[@id='accountTable']/tbody/tr[@ng-repeat='account in accounts']/td/a");

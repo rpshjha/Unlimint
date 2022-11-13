@@ -5,6 +5,9 @@ import org.openqa.selenium.WebDriver;
 
 import java.time.Duration;
 
+import static com.unlimint.core.ChromeDriverInstance.createDriverUsingChrome;
+import static com.unlimint.core.FirefoxDriverInstance.createDriverUsingFirefox;
+import static com.unlimint.core.SafariDriverInstance.createDriverUsingSafari;
 import static com.unlimint.utils.PropertyReader.get;
 
 @Log4j
@@ -29,10 +32,13 @@ public class DriverInstance {
 
         switch (browserName) {
             case "firefox":
-                driver = FirefoxDriverInstance.createDriverUsingFirefox();
+                driver = createDriverUsingFirefox();
                 break;
             case "chrome":
-                driver = ChromeDriverInstance.createDriverUsingChrome();
+                driver = createDriverUsingChrome();
+                break;
+            case "safari":
+                driver = createDriverUsingSafari();
                 break;
             default:
                 break;

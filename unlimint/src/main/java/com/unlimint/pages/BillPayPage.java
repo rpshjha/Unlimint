@@ -38,25 +38,29 @@ public class BillPayPage extends Page {
     private final By transferredAmount = By.cssSelector("span#amount");
     private final By fromAccount = By.cssSelector("span#fromAccountId");
 
-    public BillPayPage payBillTo(User user, String accountNo, int amount) {
+    /**
+     * @param recipient
+     * @param accountNoToBeTransferredTo
+     * @param amountToBeTransferred
+     */
+    public void payBillTo(User recipient, String accountNoToBeTransferredTo, int amountToBeTransferred) {
         log.info("paying bill to recipient");
 
-        this.driver.findElement(inputPayeeName).sendKeys(user.getFirstName() + " " + user.getLastName());
-        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getAddress());
-        this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
-        this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
-        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getZipcode()));
-        this.driver.findElement(inputPhone).sendKeys(user.getPhone());
-        this.driver.findElement(inputAccount).sendKeys(accountNo);
-        this.driver.findElement(inputVerifyAccount).sendKeys(accountNo);
+        this.driver.findElement(inputPayeeName).sendKeys(recipient.getFirstName() + " " + recipient.getLastName());
+        this.driver.findElement(inputAddress).sendKeys(recipient.getLocation().getAddress());
+        this.driver.findElement(inputCity).sendKeys(recipient.getLocation().getCity());
+        this.driver.findElement(inputState).sendKeys(recipient.getLocation().getState());
+        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(recipient.getLocation().getZipcode()));
+        this.driver.findElement(inputPhone).sendKeys(recipient.getPhone());
+        this.driver.findElement(inputAccount).sendKeys(accountNoToBeTransferredTo);
+        this.driver.findElement(inputVerifyAccount).sendKeys(accountNoToBeTransferredTo);
 
-        this.driver.findElement(inputAmount).sendKeys(String.valueOf(amount));
+        this.driver.findElement(inputAmount).sendKeys(String.valueOf(amountToBeTransferred));
 
         Select select = new Select(this.driver.findElement(inputFromAccount));
         select.getOptions().stream().findFirst().ifPresent(WebElement::click);
 
         this.driver.findElement(btnSendPayment).click();
-        return this;
     }
 
     public boolean isPaymentSuccessful() {
@@ -65,11 +69,25 @@ public class BillPayPage extends Page {
         WebElement h1 = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title")));
         WebElement p = this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div[ng-show='showResult'] h1.title + p + p")));
 
-        log.info("bill payment details..");
-        log.info("payee name " + driver.findElement(payeeName).getText());
-        log.info("amount" + driver.findElement(inputAmount).getText());
-        log.info("from account no " + driver.findElement(fromAccount).getText());
+        log.info("***  bill payment details ***\n" +
+                "payee name :" + getPayeeName() + "\n" +
+                "amount :" + getTransferredAmount() + "\n" +
+                "transferred from account no :" + getFromAccountNo());
         return h1.getText().contains("Bill Payment Complete") && p.getText().contains("See Account Activity for more details.");
+    }
+
+    public String getPayeeName() {
+        return driver.findElement(payeeName).getText();
+    }
+
+    public int getTransferredAmount() {
+        String text = driver.findElement(transferredAmount).getText();
+        text = text.split("\\.")[0].replaceAll("\\W+", "");
+        return Integer.parseInt(text);
+    }
+
+    public String getFromAccountNo() {
+        return driver.findElement(fromAccount).getText();
     }
 
 }

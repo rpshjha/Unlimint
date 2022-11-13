@@ -2,7 +2,7 @@ package com.unlimint.pages;
 
 import com.unlimint.exception.DuplicateUserNameException;
 import com.unlimint.pojo.User;
-import com.unlimint.utils.RandomString;
+import com.unlimint.utils.Random;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
@@ -18,7 +18,7 @@ public class RegistrationPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if registration page is displayed..");
-        return wait.until(d -> getPageTitle().contains("ParaBank | Register for Free Online Account Access"));
+        return wait.until(d ->browserActions.getPageTitle().contains("ParaBank | Register for Free Online Account Access"));
     }
 
     private final By inputFirstName = By.id("customer.firstName");
@@ -49,7 +49,7 @@ public class RegistrationPage extends Page {
         this.driver.findElement(inputPhone).sendKeys(user.getPhone());
         this.driver.findElement(inputSsn).sendKeys(user.getSsn());
 
-        String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(4);
+        String username = user.getLogin().getUsername() + Random.getRandomInt(4);
         log.info("setting username for " + user.getFirstName() + " as " + username);
         user.getLogin().setUsername(username);
         this.driver.findElement(inputUsername).sendKeys(username);

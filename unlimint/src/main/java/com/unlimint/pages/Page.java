@@ -1,5 +1,6 @@
 package com.unlimint.pages;
 
+import com.unlimint.core.BrowserActions;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -16,16 +17,12 @@ public abstract class Page {
 
     final WebDriver driver;
     final WebDriverWait wait;
+    final BrowserActions browserActions;
 
     protected Page(WebDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(Long.parseLong(get("default.timeout"))));
-    }
-
-    public Page navigateTo(String url) {
-        log.info("navigating to " + url);
-        driver.get(url);
-        return this;
+        this.browserActions = new BrowserActions(driver);
     }
 
     public boolean isError(String errorMsg) {
@@ -45,12 +42,14 @@ public abstract class Page {
         return errorTitle.getText().contains("Error!") && errorDesc.getText().contains(errorMsg);
     }
 
-    public String getPageTitle() {
-        return this.driver.getTitle();
-    }
-
     public String getPageHeading() {
         return this.wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector("div#leftPanel h2"))).getText();
+    }
+
+    public Page navigateTo(String url) {
+        log.info("navigating to " + url);
+        driver.get(url);
+        return this;
     }
 
     public abstract boolean isAt();

@@ -19,7 +19,7 @@ public class LoginPage extends Page {
     @Override
     public boolean isAt() {
         log.info("verifying if welcome page is displayed..");
-        return wait.until(d -> getPageTitle().contains("ParaBank | Welcome | Online Banking") && getPageHeading().contains("Customer Login"));
+        return wait.until(d -> browserActions.getPageTitle().contains("ParaBank | Welcome | Online Banking") && getPageHeading().contains("Customer Login"));
     }
 
     private final By btnRegister = By.linkText("Register");
@@ -35,7 +35,7 @@ public class LoginPage extends Page {
     }
 
     public AccountServicesPage loginAs(User user) {
-        log.info("logging in as ..\n" + user.getLogin().getUsername() + "\n" + user.getLogin().getPassword());
+        log.info("logging in as ..\nusername : " + user.getLogin().getUsername() + "\npassword : " + user.getLogin().getPassword());
 
         this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputUsername)).sendKeys(user.getLogin().getUsername());
         this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputPassword)).sendKeys(user.getLogin().getPassword());
@@ -44,7 +44,7 @@ public class LoginPage extends Page {
         if (isError(USERNAME_PASSWORD_NOT_VERIFIED))
             throw new InvalidUsernameAndPasswordException();
         else{
-            log.info("login successful!");
+            log.info("login successful !!");
         }
         return new AccountServicesPage(this.driver);
     }

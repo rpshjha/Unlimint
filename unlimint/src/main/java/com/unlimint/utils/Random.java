@@ -1,11 +1,10 @@
 package com.unlimint.utils;
 
 
-import java.util.Random;
+public class Random {
 
-public class RandomString {
-
-    private RandomString(){}
+    private Random() {
+    }
 
     public static String getAlphaNumericString(int n) {
 
@@ -23,4 +22,13 @@ public class RandomString {
         return sb.toString();
     }
 
+    public static int getRandomInt(int length) {
+        int bound = 9;
+        int multiplyBy = 1;
+        for (int i = 1; i < length; i++) {
+            bound = bound * 10;
+            multiplyBy = multiplyBy * 10;
+        }
+        return multiplyBy + new java.util.Random().nextInt(bound);
+    }
 }
