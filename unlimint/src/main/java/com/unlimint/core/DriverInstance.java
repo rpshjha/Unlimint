@@ -1,8 +1,11 @@
 package com.unlimint.core;
 
-import com.unlimint.utils.PropertyReader;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.WebDriver;
+
+import java.time.Duration;
+
+import static com.unlimint.utils.PropertyReader.get;
 
 @Log4j
 public class DriverInstance {
@@ -36,8 +39,9 @@ public class DriverInstance {
         }
 
         assert driver != null;
-        if (Boolean.parseBoolean(PropertyReader.get("isWindowMax")))
+        if (Boolean.parseBoolean(get("isWindowMax")))
             driver.manage().window().maximize();
+        driver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(Long.parseLong(get("page.load.timeout"))));
 
         return driver;
     }

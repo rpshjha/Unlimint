@@ -1,11 +1,13 @@
 package com.unlimint.pages;
 
-import com.unlimint.constant.Error;
 import com.unlimint.exception.InvalidUsernameAndPasswordException;
-import com.unlimint.pojo.Result;
+import com.unlimint.pojo.User;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
+import static com.unlimint.constant.Error.USERNAME_PASSWORD_NOT_VERIFIED;
 
 @Log4j
 public class LoginPage extends Page {
@@ -32,14 +34,14 @@ public class LoginPage extends Page {
         return new RegistrationPage(driver);
     }
 
-    public AccountServicesPage loginAs(Result user) {
+    public AccountServicesPage loginAs(User user) {
         log.info("logging in as ..\n" + user.getLogin().getUsername() + "\n" + user.getLogin().getPassword());
 
-        this.driver.findElement(inputUsername).sendKeys(user.getLogin().getUsername());
-        this.driver.findElement(inputPassword).sendKeys(user.getLogin().getPassword());
-        this.driver.findElement(btnLogin).click();
+        this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputUsername)).sendKeys(user.getLogin().getUsername());
+        this.wait.until(ExpectedConditions.visibilityOfElementLocated(inputPassword)).sendKeys(user.getLogin().getPassword());
+        this.wait.until(ExpectedConditions.elementToBeClickable(btnLogin)).click();
 
-        if (isError(Error.USERNAME_PASSWORD_NOT_VERIFIED))
+        if (isError(USERNAME_PASSWORD_NOT_VERIFIED))
             throw new InvalidUsernameAndPasswordException();
         else{
             log.info("login successful!");

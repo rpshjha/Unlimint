@@ -1,6 +1,6 @@
 package com.unlimint.pages;
 
-import com.unlimint.pojo.Result;
+import com.unlimint.pojo.User;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -34,14 +34,14 @@ public class BillPayPage extends Page {
 
     private final By btnSendPayment = By.cssSelector("input.button[value='Send Payment'][type='submit']");
 
-    public BillPayPage payBillTo(Result user, String accountNo, int amount) {
+    public BillPayPage payBillTo(User user, String accountNo, int amount) {
         log.info("paying bill to recipient");
 
-        this.driver.findElement(inputPayeeName).sendKeys(user.getName().getFirst());
-        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getStreet().getName());
+        this.driver.findElement(inputPayeeName).sendKeys(user.getFirstName() + " " + user.getLastName());
+        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getAddress());
         this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
         this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
-        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
+        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getZipcode()));
         this.driver.findElement(inputPhone).sendKeys(user.getPhone());
         this.driver.findElement(inputAccount).sendKeys(accountNo);
         this.driver.findElement(inputVerifyAccount).sendKeys(accountNo);

@@ -1,7 +1,7 @@
 package com.unlimint.pages;
 
 import com.unlimint.exception.DuplicateUserNameException;
-import com.unlimint.pojo.Result;
+import com.unlimint.pojo.User;
 import com.unlimint.utils.RandomString;
 import lombok.extern.log4j.Log4j;
 import org.openqa.selenium.By;
@@ -37,19 +37,19 @@ public class RegistrationPage extends Page {
 
     private final By errorDuplicateUsername = By.id("customer.username.errors");
 
-    public AccountServicesPage registerUserAs(Result user) {
-        log.info("registering user as " + user.getName().getFirst() + " " + user.getName().getLast());
+    public AccountServicesPage registerUserAs(User user) {
+        log.info("registering user as " + user.getFirstName() + " " + user.getLastName());
 
-        this.driver.findElement(inputFirstName).sendKeys(user.getName().getFirst());
-        this.driver.findElement(inputLastName).sendKeys(user.getName().getLast());
-        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getStreet().getName());
+        this.driver.findElement(inputFirstName).sendKeys(user.getFirstName());
+        this.driver.findElement(inputLastName).sendKeys(user.getLastName());
+        this.driver.findElement(inputAddress).sendKeys(user.getLocation().getAddress());
         this.driver.findElement(inputCity).sendKeys(user.getLocation().getCity());
         this.driver.findElement(inputState).sendKeys(user.getLocation().getState());
-        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getPostcode()));
+        this.driver.findElement(inputZipcode).sendKeys(String.valueOf(user.getLocation().getZipcode()));
         this.driver.findElement(inputPhone).sendKeys(user.getPhone());
-        this.driver.findElement(inputSsn).sendKeys(user.getId().getValue());
+        this.driver.findElement(inputSsn).sendKeys(user.getSsn());
 
-        String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(5);
+        String username = user.getLogin().getUsername() + RandomString.getAlphaNumericString(4);
         this.driver.findElement(inputUsername).sendKeys(username);
 
         this.driver.findElement(inputPassword).sendKeys(user.getLogin().getPassword());

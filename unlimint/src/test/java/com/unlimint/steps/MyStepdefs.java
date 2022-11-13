@@ -1,12 +1,9 @@
 package com.unlimint.steps;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.unlimint.cucumber.Context;
 import com.unlimint.cucumber.TestContext;
 import com.unlimint.pages.*;
-import com.unlimint.pojo.Result;
-import com.unlimint.pojo.Users;
+import com.unlimint.pojo.User;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
@@ -18,12 +15,15 @@ import lombok.extern.log4j.Log4j;
 import java.util.List;
 
 import static com.unlimint.core.DriverInstance.getDriver;
+import static com.unlimint.steps.TestHelper.setUserData;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Log4j
 public class MyStepdefs {
 
     private final TestContext testContext;
+    private User sender;
+    private User recipient;
 
     public MyStepdefs(TestContext testContext) {
         this.testContext = testContext;
@@ -40,19 +40,15 @@ public class MyStepdefs {
                 .log().all()
                 .get("/api");
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        Users users = null;
-        try {
-            users = objectMapper.readValue(response.body().asString(), Users.class);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
+        sender = setUserData(response, 0);
+        recipient = setUserData(response, 1);
 
-        assert users != null;
-        testContext.getScenarioContext().setContext(Context.SENDER, users.getResults().get(0));
-        testContext.getScenarioContext().setContext(Context.RECIPIENT, users.getResults().get(1));
+        log.info("sender user data is generated " + sender);
+        log.info("recipient user data is generated " + recipient);
+
+        testContext.getScenarioContext().setContext(Context.SENDER, sender);
+        testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);
     }
-
 
     @And("I register user as")
     public void iRegisterUserAs(List<String> users) {
@@ -63,11 +59,12 @@ public class MyStepdefs {
 
             assertTrue(register.isAt(), "not able to navigate to registration page");
 
-            Result userType = null;
-            if (user.equals("SENDER"))
-                userType = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
-            else if (user.equals("RECIPIENT"))
-                userType = (Result) testContext.getScenarioContext().getContext(Context.RECIPIENT);
+            User userType = null;
+
+            if (user.equals("SENDER")) {
+                userType = (User) testContext.getScenarioContext().getContext(Context.SENDER);
+            } else if (user.equals("RECIPIENT"))
+                userType = (User) testContext.getScenarioContext().getContext(Context.RECIPIENT);
 
             assert userType != null;
             AccountServicesPage accountServicesPage = register.registerUserAs(userType);
@@ -80,20 +77,19 @@ public class MyStepdefs {
 
             if (user.equals("SENDER"))
                 testContext.getScenarioContext().setContext(Context.SENDER_ACCOUNT_NO, accountNo);
-            else testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
+            else if (user.equals("RECIPIENT"))
+                testContext.getScenarioContext().setContext(Context.RECIPIENT_ACCOUNT_NO, accountNo);
 
             loginPage = accountServicesPage.logout();
             assertTrue(loginPage.isAt(), "not able to navigate to home page");
-
         });
     }
 
     @When("I login as a SENDER")
     public void iLoginAsASENDER() {
-
         LoginPage loginPage = new LoginPage(getDriver());
 
-        Result user = (Result) testContext.getScenarioContext().getContext(Context.SENDER);
+        User user = (User) testContext.getScenarioContext().getContext(Context.SENDER);
 
         AccountServicesPage overviewPage = loginPage.loginAs(user);
         assertTrue(overviewPage.isAt(), "not able to login user");
@@ -106,11 +102,10 @@ public class MyStepdefs {
         BillPayPage billPay = accountServicesPage.goToBillPayPage();
         assertTrue(billPay.isAt(), "not able to navigate to bill pay page");
 
-        Result user = (Result) testContext.getScenarioContext().getContext(Context.RECIPIENT);
+        User user = (User) testContext.getScenarioContext().getContext(Context.RECIPIENT);
         String accountNoRecipient = (String) testContext.getScenarioContext().getContext(Context.RECIPIENT_ACCOUNT_NO);
 
         billPay.payBillTo(user, accountNoRecipient, amount);
-
         assertTrue(billPay.isPaymentSuccessful(), "bill payment could not be done");
     }
 

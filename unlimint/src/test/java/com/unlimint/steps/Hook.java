@@ -1,6 +1,9 @@
 package com.unlimint.steps;
 
 import com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter;
+import com.unlimint.pojo.Location;
+import com.unlimint.pojo.Login;
+import com.unlimint.pojo.User;
 import com.unlimint.utils.PropertyReader;
 import io.cucumber.java.After;
 import io.cucumber.java.Before;
@@ -86,4 +89,5 @@ public class Hook {
 
         ExtentCucumberAdapter.getCurrentStep().addScreenCaptureFromBase64String(screenshotInBase64, scenarioName);
     }
+
 }
