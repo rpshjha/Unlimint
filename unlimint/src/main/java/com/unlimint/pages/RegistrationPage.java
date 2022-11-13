@@ -55,11 +55,10 @@ public class RegistrationPage extends Page {
         String username = user.getLogin().getUsername() + Random.getRandomInt(4);
         log.info("setting username for " + user.getFirstName() + " as " + username);
         user.getLogin().setUsername(username);
-        this.element.enterText(inputUsername, username);
 
+        this.element.enterText(inputUsername, username);
         this.element.enterText(inputPassword, user.getLogin().getPassword());
         this.element.enterText(inputConfirmPassword, user.getLogin().getPassword());
-
         this.element.click(btnRegister);
 
         if (isUserNameAlreadyExist()) {

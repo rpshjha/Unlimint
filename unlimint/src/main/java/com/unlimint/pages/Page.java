@@ -35,7 +35,6 @@ public abstract class Page {
         } catch (org.openqa.selenium.TimeoutException timeoutException) {
             return false;
         }
-
     }
 
     public String getPageHeading() {

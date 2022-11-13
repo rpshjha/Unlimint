@@ -53,7 +53,6 @@ public class BillPayPage extends Page {
         this.element.enterText(inputPhone, recipient.getPhone());
         this.element.enterText(inputAccount, accountNoToBeTransferredTo);
         this.element.enterText(inputVerifyAccount, accountNoToBeTransferredTo);
-
         this.element.enterText(inputAmount, String.valueOf(amountToBeTransferred));
 
         Select select = new Select(this.driver.findElement(inputFromAccount));
