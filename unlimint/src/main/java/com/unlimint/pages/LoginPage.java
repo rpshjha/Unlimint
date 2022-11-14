@@ -22,6 +22,7 @@ public class LoginPage extends Page {
     }
 
     private final By btnRegister = By.linkText("Register");
+    private final By btnForgotLogin = By.xpath("//a[text()='Forgot login info?']");
     private final By inputUsername = By.name("username");
     private final By inputPassword = By.name("password");
     private final By btnLogin = By.cssSelector("input[value='Log In']");
@@ -30,6 +31,12 @@ public class LoginPage extends Page {
         log.info("navigating to user registration page");
         this.element.click(btnRegister);
         return new RegistrationPage(driver);
+    }
+
+    public CustomerLookupPage goToForgotLoginInfoPage() {
+        log.info("navigating to forgot login info page");
+        this.element.click(btnForgotLogin);
+        return new CustomerLookupPage(driver);
     }
 
     public AccountServicesPage loginAs(User user) {

@@ -108,8 +108,8 @@ public class MyStepdefs {
         LoginPage loginPage = new LoginPage(getDriver());
         User user = (User) testContext.getScenarioContext().getContext(Context.SENDER);
 
-        AccountServicesPage overviewPage = loginPage.loginAs(user);
-        assertTrue(overviewPage.isAt(), "not able to login user");
+        AccountServicesPage accountServicesPage = loginPage.loginAs(user);
+        assertTrue(accountServicesPage.isAt(), "not able to login user");
     }
 
     @Then("I can transfer amount {int} to RECIPIENT")
@@ -128,6 +128,8 @@ public class MyStepdefs {
         assertEquals(billPay.getPayeeName(), recipient.getFirstName() + " " + recipient.getLastName(), "payee name is not correct");
         assertEquals(billPay.getTransferredAmount(), amount, "amount transferred is not correct");
         assertEquals(billPay.getFromAccountNo(), accountNoSender, "account no of sender is not correct");
+
+        accountServicesPage.logout();
     }
 
     @When("I navigate to {string}")
@@ -138,4 +140,14 @@ public class MyStepdefs {
         assertTrue(page.isAt(), "not able to navigate to home page");
     }
 
+    @And("I want to find my login info")
+    public void iWantToFindMyLoginInfo() {
+        LoginPage loginPage = new LoginPage(getDriver());
+        CustomerLookupPage customerLookupPage = loginPage.goToForgotLoginInfoPage();
+
+        User recipient = (User) testContext.getScenarioContext().getContext(Context.RECIPIENT);
+        AccountServicesPage accountServicesPage = customerLookupPage.findMyLoginInfo(recipient);
+
+        accountServicesPage.logout();
+    }
 }

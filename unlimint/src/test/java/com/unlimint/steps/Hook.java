@@ -72,7 +72,7 @@ public class Hook {
         }
         try {
             getCurrentScenario().assignAuthor(System.getProperty("user.name"));
-            killDriver();
+//            killDriver();
         } catch (java.lang.NullPointerException exception) {
             log.error(exception.getMessage());
             throw new RuntimeException(exception);
