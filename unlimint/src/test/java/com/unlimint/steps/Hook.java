@@ -8,8 +8,11 @@ import io.cucumber.java.AfterStep;
 import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 import lombok.extern.log4j.Log4j;
+import org.apache.commons.io.FileUtils;
 import org.openqa.selenium.OutputType;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.Duration;
 
 import static com.aventstack.extentreports.cucumber.adapter.ExtentCucumberAdapter.getCurrentScenario;
@@ -43,6 +46,18 @@ public class Hook {
                         "|  `--,  |  .-.  | |  | |  |    |  `--,  |  |  \\  : \n" +
                         "|  |`    |  | |  | |  | |  '--. |  `---. |  '--'  / \n" +
                         "`--'     `--' `--' `--' `-----' `------' `-------'  ");
+                try {
+                    FileUtils.copyFile(
+                            new BrowserActions(getDriver())
+                                    .captureScreenshot(OutputType.FILE),
+                            new File(
+                                    System.getProperty("user.dir") + File.separator +
+                                            "test-output" + File.separator +
+                                            "screenshots" + File.separator +
+                                            scenario.getName() + System.currentTimeMillis() + ".png"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 break;
             case SKIPPED:
                 System.out.println(",---.   ,--. ,--. ,--. ,------.  ,------.  ,------. ,------.   \n" +

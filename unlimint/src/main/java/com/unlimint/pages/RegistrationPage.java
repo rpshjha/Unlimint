@@ -36,7 +36,6 @@ public class RegistrationPage extends Page {
     private final By errorDuplicateUsername = By.id("customer.username.errors");
 
     /**
-     *
      * @param user
      * @return
      */
@@ -52,7 +51,7 @@ public class RegistrationPage extends Page {
         this.element.enterText(inputPhone, user.getPhone());
         this.element.enterText(inputSsn, user.getSsn());
 
-        String username = user.getLogin().getUsername() + Random.getRandomInt(4);
+        String username = user.getLastName() + user.getFirstName() + Random.getRandomInt(4);
         log.info("setting username for " + user.getFirstName() + " as " + username);
         user.getLogin().setUsername(username);
 

@@ -3,6 +3,7 @@ package com.unlimint.steps;
 import com.unlimint.cucumber.Context;
 import com.unlimint.cucumber.TestContext;
 import com.unlimint.pages.*;
+import com.unlimint.pojo.Location;
 import com.unlimint.pojo.User;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
@@ -49,17 +50,36 @@ public class MyStepdefs {
         testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);
     }
 
+    @Given("I generate {int} users")
+    public void iGenerateUsers(int noOfUser) {
+        log.info("generating users .. ");
+        Response response = RestAssured.given()
+                .baseUri("https://randomuser.me")
+                .queryParam("format", "pretty")
+                .queryParam("results", noOfUser)
+                .queryParam("nat", Location.getRandomLocation())
+                .log().all()
+                .get("/api");
+
+        User sender = setUserData(response, 0);
+        User recipient = setUserData(response, 1);
+
+        log.info("sender user data is generated \n" + sender);
+        log.info("recipient user data is generated \n" + recipient);
+
+        testContext.getScenarioContext().setContext(Context.SENDER, sender);
+        testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);
+    }
+
     @And("I register user as")
     public void iRegisterUserAs(List<String> users) {
         users.forEach(user -> {
 
             LoginPage loginPage = new LoginPage(getDriver());
             RegistrationPage register = loginPage.goToRegistrationPage();
-
             assertTrue(register.isAt(), "not able to navigate to registration page");
 
             User userType = null;
-
             if (user.equals("SENDER")) {
                 userType = (User) testContext.getScenarioContext().getContext(Context.SENDER);
             } else if (user.equals("RECIPIENT"))
@@ -86,7 +106,6 @@ public class MyStepdefs {
     @When("I login as a SENDER")
     public void iLoginAsASENDER() {
         LoginPage loginPage = new LoginPage(getDriver());
-
         User user = (User) testContext.getScenarioContext().getContext(Context.SENDER);
 
         AccountServicesPage overviewPage = loginPage.loginAs(user);
