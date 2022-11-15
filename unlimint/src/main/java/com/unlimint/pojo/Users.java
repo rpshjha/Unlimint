@@ -12,5 +12,4 @@ public class Users {
 
     @JsonProperty("results")
     public List<User> userList;
-
 }

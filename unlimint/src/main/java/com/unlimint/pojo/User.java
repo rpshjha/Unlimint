@@ -10,7 +10,6 @@ import lombok.ToString;
 @JsonIgnoreProperties({"gender", "description", "email", "dob", "registered", "phone", "picture", "nat"})
 public class User {
 
-    @JsonProperty("name")
     private Name name;
     private Location location;
     @JsonProperty("cell")
@@ -18,5 +17,4 @@ public class User {
     @JsonProperty("id")
     private Id ssn;
     private Login login;
-
 }
