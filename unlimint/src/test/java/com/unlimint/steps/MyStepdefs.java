@@ -1,24 +1,22 @@
 package com.unlimint.steps;
 
+import com.unlimint.api.GenerateUser;
 import com.unlimint.cucumber.Context;
 import com.unlimint.cucumber.TestContext;
 import com.unlimint.pages.*;
-import com.unlimint.pojo.Location;
 import com.unlimint.pojo.User;
+import com.unlimint.pojo.Users;
 import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
-import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import lombok.extern.log4j.Log4j;
 
 import java.util.List;
 
 import static com.unlimint.core.DriverInstance.getDriver;
-import static com.unlimint.steps.TestHelper.setUserData;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @Log4j
 public class MyStepdefs {
@@ -31,44 +29,30 @@ public class MyStepdefs {
 
     @Given("I generate {int} users of {string} nationality")
     public void iGenerateUsers(int noOfUser, String nationality) {
-        log.info("generating users .. ");
-        Response response = RestAssured.given()
-                .baseUri("https://randomuser.me")
-                .queryParam("format", "pretty")
-                .queryParam("results", noOfUser)
-                .queryParam("nat", nationality)
-                .log().all()
-                .get("/api");
+        Response response = GenerateUser.generate(noOfUser, nationality);
+        Users users = GenerateUser.parseResponse(response);
 
-        User sender = setUserData(response, 0);
-        User recipient = setUserData(response, 1);
+        assert users != null;
 
-        log.info("sender user data is generated \n" + sender);
-        log.info("recipient user data is generated \n" + recipient);
+        log.info("sender user data is generated \n" + users.getUserList().get(0));
+        testContext.getScenarioContext().setContext(Context.SENDER, users.getUserList().get(0));
 
-        testContext.getScenarioContext().setContext(Context.SENDER, sender);
-        testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);
+        log.info("recipient user data is generated \n" + users.getUserList().get(1));
+        testContext.getScenarioContext().setContext(Context.RECIPIENT, users.getUserList().get(1));
     }
 
     @Given("I generate {int} users")
     public void iGenerateUsers(int noOfUser) {
-        log.info("generating users .. ");
-        Response response = RestAssured.given()
-                .baseUri("https://randomuser.me")
-                .queryParam("format", "pretty")
-                .queryParam("results", noOfUser)
-                .queryParam("nat", Location.getRandomLocation())
-                .log().all()
-                .get("/api");
+        Response response = GenerateUser.generate(noOfUser);
+        Users users = GenerateUser.parseResponse(response);
 
-        User sender = setUserData(response, 0);
-        User recipient = setUserData(response, 1);
+        assert users != null;
 
-        log.info("sender user data is generated \n" + sender);
-        log.info("recipient user data is generated \n" + recipient);
+        log.info("sender user data is generated \n" + users.getUserList().get(0));
+        testContext.getScenarioContext().setContext(Context.SENDER, users.getUserList().get(0));
 
-        testContext.getScenarioContext().setContext(Context.SENDER, sender);
-        testContext.getScenarioContext().setContext(Context.RECIPIENT, recipient);
+        log.info("recipient user data is generated \n" + users.getUserList().get(1));
+        testContext.getScenarioContext().setContext(Context.RECIPIENT, users.getUserList().get(1));
     }
 
     @And("I register user as")
@@ -90,6 +74,8 @@ public class MyStepdefs {
             assertTrue(accountServicesPage.isRegistered(userType.getLogin().getUsername()), "not able to register user");
 
             AccountsOverviewPage accountsOverviewPage = accountServicesPage.goToAccountsOverviewPage();
+            assertFalse(accountServicesPage.isError(com.unlimint.constant.Error.INTERNAL_ERROR), "internal error occurred..");
+
             assertTrue(accountsOverviewPage.isAt());
 
             String accountNo = accountsOverviewPage.getAccountNo();
@@ -125,7 +111,7 @@ public class MyStepdefs {
 
         billPay.payBillTo(recipient, accountNoRecipient, amount);
         assertTrue(billPay.isPaymentSuccessful(), "bill payment could not be done");
-        assertEquals(billPay.getPayeeName(), recipient.getFirstName() + " " + recipient.getLastName(), "payee name is not correct");
+        assertEquals(billPay.getPayeeName(), recipient.getName().getFirst() + " " + recipient.getName().getLast(), "payee name is not correct");
         assertEquals(billPay.getTransferredAmount(), amount, "amount transferred is not correct");
         assertEquals(billPay.getFromAccountNo(), accountNoSender, "account no of sender is not correct");
 

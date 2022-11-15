@@ -1,10 +1,10 @@
 package com.unlimint.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
-import lombok.ToString;
 
 @Data
-@ToString
+@JsonIgnoreProperties({"uuid", "salt", "md5", "sha1", "sha256"})
 public class Login {
 
     private String username;

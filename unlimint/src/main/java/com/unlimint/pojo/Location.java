@@ -1,19 +1,22 @@
 package com.unlimint.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
 @Data
-@ToString
+@JsonIgnoreProperties({"country", "coordinates", "timezone"})
 public class Location {
 
-    private String address;
+    @JsonProperty("street")
+    private Street address;
     private String city;
     private String state;
+    @JsonProperty("postcode")
     private String zipcode;
 
     public static String getRandomLocation() {

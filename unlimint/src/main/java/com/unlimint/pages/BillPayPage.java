@@ -45,8 +45,8 @@ public class BillPayPage extends Page {
     public void payBillTo(User recipient, String accountNoToBeTransferredTo, int amountToBeTransferred) {
         log.info("paying bill to recipient");
 
-        this.element.enterText(inputPayeeName,recipient.getFirstName() + " " + recipient.getLastName());
-        this.element.enterText(inputAddress , recipient.getLocation().getAddress());
+        this.element.enterText(inputPayeeName,recipient.getName().getFirst() + " " + recipient.getName().getLast());
+        this.element.enterText(inputAddress , recipient.getLocation().getAddress().getName());
         this.element.enterText(inputCity,recipient.getLocation().getCity());
         this.element.enterText(inputState, recipient.getLocation().getState());
         this.element.enterText(inputZipcode, String.valueOf(recipient.getLocation().getZipcode()));

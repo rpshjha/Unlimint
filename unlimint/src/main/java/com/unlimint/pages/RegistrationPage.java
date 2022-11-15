@@ -40,19 +40,19 @@ public class RegistrationPage extends Page {
      * @return
      */
     public AccountServicesPage registerUserAs(User user) {
-        log.info("registering user as " + user.getFirstName() + " " + user.getLastName());
+        log.info("registering user as " + user.getName().getFirst() + " " + user.getName().getLast());
 
-        this.element.enterText(inputFirstName, user.getFirstName());
-        this.element.enterText(inputLastName, user.getLastName());
-        this.element.enterText(inputAddress, user.getLocation().getAddress());
+        this.element.enterText(inputFirstName, user.getName().getFirst());
+        this.element.enterText(inputLastName, user.getName().getLast());
+        this.element.enterText(inputAddress, user.getLocation().getAddress().getName());
         this.element.enterText(inputCity, user.getLocation().getCity());
         this.element.enterText(inputState, user.getLocation().getState());
         this.element.enterText(inputZipcode, String.valueOf(user.getLocation().getZipcode()));
         this.element.enterText(inputPhone, user.getPhone());
-        this.element.enterText(inputSsn, user.getSsn());
+        this.element.enterText(inputSsn, user.getSsn().getValue());
 
-        String username = user.getLastName() + user.getFirstName() + Random.getRandomInt(4);
-        log.info("setting username for " + user.getFirstName() + " as " + username);
+        String username = user.getName().getLast() + user.getName().getFirst() + Random.getRandomInt(4);
+        log.info("setting username for " + user.getName().getFirst() + " as " + username);
         user.getLogin().setUsername(username);
 
         this.element.enterText(inputUsername, username);

@@ -40,13 +40,13 @@ public class CustomerLookupPage extends Page {
     public AccountServicesPage findMyLoginInfo(User user) {
         log.info("recovering password ..");
 
-        this.element.enterText(inputFirstName, user.getFirstName());
-        this.element.enterText(inputLastName, user.getLastName());
-        this.element.enterText(inputAddress, user.getLocation().getAddress());
+        this.element.enterText(inputFirstName, user.getName().getFirst());
+        this.element.enterText(inputLastName, user.getName().getLast());
+        this.element.enterText(inputAddress, user.getLocation().getAddress().getName());
         this.element.enterText(inputCity, user.getLocation().getCity());
         this.element.enterText(inputState, user.getLocation().getState());
         this.element.enterText(inputZipcode, user.getLocation().getZipcode());
-        this.element.enterText(inputSSN, user.getSsn());
+        this.element.enterText(inputSSN, user.getSsn().getValue());
         this.element.click(btnFindMyLoginInfo);
 
         try {

@@ -1,7 +1,7 @@
 Feature: UI Automated tests
 
   Background: Generate user
-    Given I generate 2 users
+    Given I generate 2 users of 'US' nationality
 
   @001
   Scenario: Register a user and make a bill payment
