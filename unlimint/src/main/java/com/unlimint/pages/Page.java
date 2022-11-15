@@ -29,8 +29,8 @@ public abstract class Page {
     public boolean isError(String errorMsg) {
         log.info("checking for error..");
         try {
-            String errorTitle = element.getText(By.cssSelector("h1.title"), 4);
-            String errorDesc = element.getText(By.cssSelector("p.error"), 4);
+            String errorTitle = element.getText(By.cssSelector("h1.title"), 5);
+            String errorDesc = element.getText(By.cssSelector("p.error"), 5);
             return errorTitle.contains("Error!") && errorDesc.contains(errorMsg);
         } catch (org.openqa.selenium.TimeoutException timeoutException) {
             return false;

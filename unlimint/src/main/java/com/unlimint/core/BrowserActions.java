@@ -16,7 +16,7 @@ public class BrowserActions {
     }
 
     public <T> T captureScreenshot(OutputType<T> outputType){
-        log.info("capturing screenshot ..");
+        log.info("capturing screenshot .. as " + outputType.toString());
         TakesScreenshot takesScreenshot = ((TakesScreenshot) driver);
         return takesScreenshot.getScreenshotAs(outputType);
     }

@@ -75,7 +75,6 @@ public class MyStepdefs {
 
             AccountsOverviewPage accountsOverviewPage = accountServicesPage.goToAccountsOverviewPage();
             assertFalse(accountServicesPage.isError(com.unlimint.constant.Error.INTERNAL_ERROR), "internal error occurred..");
-
             assertTrue(accountsOverviewPage.isAt());
 
             String accountNo = accountsOverviewPage.getAccountNo();
@@ -95,6 +94,7 @@ public class MyStepdefs {
         User user = (User) testContext.getScenarioContext().getContext(Context.SENDER);
 
         AccountServicesPage accountServicesPage = loginPage.loginAs(user);
+        assertFalse(accountServicesPage.isError(com.unlimint.constant.Error.INTERNAL_ERROR), "internal error occurred..");
         assertTrue(accountServicesPage.isAt(), "not able to login user");
     }
 
